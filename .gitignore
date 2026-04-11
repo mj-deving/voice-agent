@@ -25,3 +25,6 @@ Thumbs.db
 
 # Obsidian (if used as wiki)
 .obsidian/
+
+# Claude Code
+CLAUDE.md
