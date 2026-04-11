@@ -1,0 +1,65 @@
+# Test-Szenarien für Arztpraxis Dr. Müller Voice Agent
+# Jedes Szenario simuliert einen typischen Anruf
+
+scenarios:
+  - id: 1
+    name: "Neuer Patient - Terminbuchung"
+    caller: "Thomas Schneider"
+    description: "Neuer Patient mit Rückenschmerzen möchte Termin buchen"
+    dialog_hints:
+      - "Guten Tag, ich hätte gerne einen Termin"
+      - "Ich bin ein neuer Patient"
+      - "Ich habe seit einer Woche Rückenschmerzen"
+      - "Thomas Schneider, geboren am 15.03.1985"
+      - "Morgen Vormittag wäre gut"
+    expected_action: "book_appointment"
+    expected_params:
+      patient_name: "Thomas Schneider"
+      reason: "Rückenschmerzen"
+      is_new_patient: true
+
+  - id: 2
+    name: "Bestandspatient - Rezept"
+    caller: "Maria Weber"
+    description: "Bestandspatientin braucht Rezept-Nachbestellung"
+    dialog_hints:
+      - "Hallo, ich brauche ein neues Rezept für mein Blutdruckmedikament"
+      - "Ja, ich bin Patientin bei Dr. Müller, Maria Weber"
+      - "Ramipril 5mg"
+    expected_action: "transfer_call"
+    expected_params:
+      destination: "praxis"
+      reason: "Rezept-Nachbestellung"
+
+  - id: 3
+    name: "Notfall - Brustschmerzen"
+    caller: "Hans Müller"
+    description: "Anrufer mit akuten starken Brustschmerzen"
+    dialog_hints:
+      - "Hilfe, ich habe starke Brustschmerzen!"
+      - "Seit etwa 20 Minuten, der Schmerz strahlt in den linken Arm"
+    expected_action: "emergency_112"
+    expected_params: {}
+
+  - id: 4
+    name: "Öffnungszeiten-Anfrage"
+    caller: "Anna Schmidt"
+    description: "Frage zu den Öffnungszeiten der Praxis"
+    dialog_hints:
+      - "Können Sie mir sagen wann die Praxis geöffnet hat?"
+      - "Und samstags?"
+    expected_action: "info_only"
+    expected_params: {}
+
+  - id: 5
+    name: "Pharma-Vertreter"
+    caller: "Dr. Klaus Fischer"
+    description: "Pharma-Vertreter möchte Arzt sprechen"
+    dialog_hints:
+      - "Guten Tag, hier ist Dr. Fischer von Pharma GmbH"
+      - "Ich würde gerne einen Termin mit Frau Dr. Müller vereinbaren"
+      - "Es geht um unser neues Präparat"
+    expected_action: "send_summary"
+    expected_params:
+      caller_name: "Dr. Klaus Fischer"
+      action_required: true

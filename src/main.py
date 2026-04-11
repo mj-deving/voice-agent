@@ -1,7 +1,9 @@
-"""Main entry point."""
+"""Main entry point — starts the Vapi webhook server."""
 
 import os
 from pathlib import Path
+
+import uvicorn
 
 
 def load_env():
@@ -23,7 +25,24 @@ def load_env():
 
 def main():
     load_env()
-    print("Project running. Edit src/main.py to get started.")
+
+    if not os.environ.get("VAPI_API_KEY"):
+        print("Warning: VAPI_API_KEY not set. Webhook server will run but setup/test scripts won't work.")
+        print("Set it with: export VAPI_API_KEY=your-key-here")
+
+    host = os.environ.get("HOST", "0.0.0.0")
+    port = int(os.environ.get("PORT", "8000"))
+
+    print(f"Starting Vapi webhook server on {host}:{port}")
+    print(f"Webhook endpoint: http://{host}:{port}/api/vapi/webhook")
+    print(f"Health check: http://{host}:{port}/health")
+
+    uvicorn.run(
+        "src.webhook_server:app",
+        host=host,
+        port=port,
+        reload=os.environ.get("DEBUG", "").lower() in ("1", "true"),
+    )
 
 
 if __name__ == "__main__":
