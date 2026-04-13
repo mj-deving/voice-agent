@@ -1,4 +1,4 @@
-# Voice Agent MVP — Praxis Dr. Müller
+# Voice Agent — Praxis Dr. Müller
 
 ![Python](https://img.shields.io/badge/python-3.12+-blue.svg)
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
@@ -68,7 +68,7 @@ Lisa, die KI-Assistentin der Praxis Dr. Sarah Müller, beantwortet eingehende An
 ## Project Structure
 
 ```
-voice-agent-mvp/
+voice-agent/
 ├── src/
 │   ├── main.py              # Entry point — starts webhook server
 │   ├── agent_config.py      # System prompt, tools, voice/model config
