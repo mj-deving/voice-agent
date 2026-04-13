@@ -1,11 +1,23 @@
 """FastAPI webhook server for Vapi tool calls."""
 
+import asyncio
+import logging
+import os
+
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
 
+from src.availability import book_slot, get_next_available, is_slot_available
 from src.call_logger import log_call_event
+from src.notifications import send_notification
+from src.webhook_auth import HmacAuthMiddleware
+
+logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Vapi Webhook Server - Praxis Dr. Müller")
+app.add_middleware(HmacAuthMiddleware)
+
+PRAXIS_PHONE = os.environ.get("PRAXIS_PHONE_NUMBER", "089-12345678")
 
 
 @app.get("/health")
@@ -25,6 +37,8 @@ async def vapi_webhook(request: Request):
 
     if message_type == "function-call":
         return await _handle_function_call(payload)
+    elif message_type == "transfer-destination-request":
+        return await _handle_transfer_destination(payload)
     elif message_type == "end-of-call-report":
         return await _handle_end_of_call(payload)
     elif message_type == "status-update":
@@ -54,7 +68,7 @@ async def _handle_function_call(payload: dict) -> JSONResponse:
 
 
 async def _handle_book_appointment(params: dict) -> str:
-    """Handle appointment booking requests."""
+    """Handle appointment booking requests with availability checking."""
     patient_name = params.get("patient_name", "Unbekannt")
     date = params.get("date", "")
     time = params.get("time", "")
@@ -68,11 +82,30 @@ async def _handle_book_appointment(params: dict) -> str:
         details={"date": date, "time": time, "reason": reason, "is_new_patient": is_new},
     )
 
-    patient_type = "neuer Patient" if is_new else "Patient"
+    if is_slot_available(date, time):
+        book_slot(date, time, patient_name)
+        patient_type = "neuer Patient" if is_new else "Patient"
+        return (
+            f"Termin erfolgreich gebucht: {patient_type} {patient_name} "
+            f"am {date} um {time} Uhr. Grund: {reason}. "
+            f"Bitte bestätigen Sie dem Anrufer den Termin."
+        )
+
+    # Slot unavailable — suggest alternatives
+    alternatives = get_next_available(date, time, count=3)
+    if alternatives:
+        alt_text = ", ".join(
+            f"{a['date']} um {a['time']} Uhr" for a in alternatives
+        )
+        return (
+            f"Der Termin am {date} um {time} Uhr ist leider nicht verfügbar. "
+            f"Folgende Alternativen sind frei: {alt_text}. "
+            f"Bitte fragen Sie den Anrufer, welcher Termin passt."
+        )
     return (
-        f"Termin erfolgreich gebucht: {patient_type} {patient_name} "
-        f"am {date} um {time} Uhr. Grund: {reason}. "
-        f"Bitte bestätigen Sie dem Anrufer den Termin."
+        f"Der Termin am {date} um {time} Uhr ist leider nicht verfügbar. "
+        f"Derzeit sind keine freien Termine vorhanden. "
+        f"Bitte bitten Sie den Anrufer, es später erneut zu versuchen."
     )
 
 
@@ -109,8 +142,35 @@ async def _handle_send_summary(params: dict) -> str:
         },
     )
 
+    result = await asyncio.to_thread(send_notification, summary, caller_name, action_required)
+    if not result.get("email") and not result.get("webhook"):
+        logger.warning("No notification channels delivered for call from %s", caller_name)
+
     action_text = " Aktion erforderlich." if action_required else ""
     return f"Zusammenfassung gesendet.{action_text}"
+
+
+async def _handle_transfer_destination(payload: dict) -> JSONResponse:
+    """Handle transfer-destination-request from Vapi.
+
+    Returns the phone number to transfer the call to.
+    """
+    message = payload.get("message", {})
+    destination = message.get("destination", "praxis")
+
+    log_call_event(
+        event_type="transfer_destination",
+        action="transfer_call",
+        details={"destination": destination},
+    )
+
+    return JSONResponse(content={
+        "destination": {
+            "type": "number",
+            "number": PRAXIS_PHONE,
+            "message": "Ich verbinde Sie jetzt mit der Praxis. Einen Moment bitte.",
+        }
+    })
 
 
 async def _handle_end_of_call(payload: dict) -> JSONResponse:

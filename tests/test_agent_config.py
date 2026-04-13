@@ -99,9 +99,10 @@ class TestToolDefinitions:
     def test_three_tools_defined(self):
         assert len(TOOL_DEFINITIONS) == 3
 
-    def test_all_tools_are_function_type(self):
+    def test_all_tools_have_valid_type(self):
+        valid_types = {"function", "transferCall"}
         for tool in TOOL_DEFINITIONS:
-            assert tool["type"] == "function"
+            assert tool["type"] in valid_types
 
 
 class TestBookAppointmentTool:

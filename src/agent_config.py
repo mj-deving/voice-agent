@@ -78,7 +78,7 @@ TOOL_DEFINITIONS = [
         },
     },
     {
-        "type": "function",
+        "type": "transferCall",
         "function": {
             "name": "transfer_call",
             "description": "Leitet den Anruf an die Praxis weiter (z.B. für Rezepte, Überweisungen)",
@@ -98,6 +98,13 @@ TOOL_DEFINITIONS = [
                 "required": ["destination"],
             },
         },
+        "destinations": [
+            {
+                "type": "number",
+                "number": "+498912345678",
+                "message": "Ich verbinde Sie jetzt mit der Praxis. Einen Moment bitte.",
+            }
+        ],
     },
     {
         "type": "function",

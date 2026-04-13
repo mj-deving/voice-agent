@@ -41,30 +41,38 @@ class TestBookAppointment:
             }
         }
 
+    @patch("src.webhook_server.book_slot", return_value=True)
+    @patch("src.webhook_server.is_slot_available", return_value=True)
     @patch("src.webhook_server.log_call_event")
-    def test_book_appointment_returns_200(self, mock_log):
+    def test_book_appointment_returns_200(self, mock_log, _mock_avail, _mock_book):
         mock_log.return_value = {}
         response = client.post("/api/vapi/webhook", json=self._make_payload())
         assert response.status_code == 200
 
+    @patch("src.webhook_server.book_slot", return_value=True)
+    @patch("src.webhook_server.is_slot_available", return_value=True)
     @patch("src.webhook_server.log_call_event")
-    def test_book_appointment_returns_confirmation(self, mock_log):
+    def test_book_appointment_returns_confirmation(self, mock_log, _mock_avail, _mock_book):
         mock_log.return_value = {}
         response = client.post("/api/vapi/webhook", json=self._make_payload())
         result = response.json()["result"]
         assert "Termin erfolgreich gebucht" in result
         assert "Thomas Schneider" in result
 
+    @patch("src.webhook_server.book_slot", return_value=True)
+    @patch("src.webhook_server.is_slot_available", return_value=True)
     @patch("src.webhook_server.log_call_event")
-    def test_book_appointment_includes_date_and_time(self, mock_log):
+    def test_book_appointment_includes_date_and_time(self, mock_log, _mock_avail, _mock_book):
         mock_log.return_value = {}
         response = client.post("/api/vapi/webhook", json=self._make_payload())
         result = response.json()["result"]
         assert "2026-04-14" in result
         assert "09:00" in result
 
+    @patch("src.webhook_server.book_slot", return_value=True)
+    @patch("src.webhook_server.is_slot_available", return_value=True)
     @patch("src.webhook_server.log_call_event")
-    def test_book_appointment_new_patient_label(self, mock_log):
+    def test_book_appointment_new_patient_label(self, mock_log, _mock_avail, _mock_book):
         mock_log.return_value = {}
         response = client.post(
             "/api/vapi/webhook",
@@ -73,8 +81,10 @@ class TestBookAppointment:
         result = response.json()["result"]
         assert "neuer Patient" in result
 
+    @patch("src.webhook_server.book_slot", return_value=True)
+    @patch("src.webhook_server.is_slot_available", return_value=True)
     @patch("src.webhook_server.log_call_event")
-    def test_book_appointment_existing_patient_label(self, mock_log):
+    def test_book_appointment_existing_patient_label(self, mock_log, _mock_avail, _mock_book):
         mock_log.return_value = {}
         response = client.post(
             "/api/vapi/webhook",
@@ -84,8 +94,10 @@ class TestBookAppointment:
         assert "Patient" in result
         assert "neuer Patient" not in result
 
+    @patch("src.webhook_server.book_slot", return_value=True)
+    @patch("src.webhook_server.is_slot_available", return_value=True)
     @patch("src.webhook_server.log_call_event")
-    def test_book_appointment_logs_event(self, mock_log):
+    def test_book_appointment_logs_event(self, mock_log, _mock_avail, _mock_book):
         mock_log.return_value = {}
         client.post("/api/vapi/webhook", json=self._make_payload())
         mock_log.assert_called_once()
