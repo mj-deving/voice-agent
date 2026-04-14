@@ -1,9 +1,38 @@
 # Voice Agent — Praxis Dr. Müller
 
-![Python](https://img.shields.io/badge/python-3.12+-blue.svg)
-![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
+[![Python](https://img.shields.io/badge/python-3.12+-blue.svg)](#tech-stack)
+[![Vapi.ai](https://img.shields.io/badge/vapi.ai-voice--agent-blue.svg)](https://vapi.ai)
+[![Status](https://img.shields.io/badge/status-live-brightgreen.svg)](#live-vapi-call-results)
+[![Tests](https://img.shields.io/badge/tests-156%2F156-brightgreen.svg)](#tests)
+[![Docker](https://img.shields.io/badge/docker-ready-blue.svg)](#deployment)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](#license)
 
-**KI-Telefonagent für eine Arztpraxis — nimmt Anrufe entgegen, qualifiziert Anrufer, bucht Termine und leitet weiter.**
+**KI-Telefonagent für Arztpraxen — beantwortet Anrufe auf Deutsch, bucht Termine mit Verfügbarkeitsprüfung, erkennt Notfälle, leitet weiter, und passt die Begrüßung an Feiertage und Öffnungszeiten an.** Multi-Praxis-fähig via YAML-Config. 156 Tests, Analytics-Dashboard, 5/5 Live-Szenarien bestanden.
+
+## Table of Contents
+
+- [Quick Start](#quick-start)
+- [What It Does](#what-it-does)
+- [Architecture](#architecture)
+- [Project Structure](#project-structure)
+- [Live Vapi Call Results](#live-vapi-call-results)
+- [Configuration](#configuration)
+- [Multi-Praxis Support](#multi-praxis-support)
+- [Holiday & Hours-Aware Greetings](#holiday--hours-aware-greetings)
+- [Analytics Dashboard](#analytics-dashboard)
+- [Setup](#setup)
+- [Deployment](#deployment)
+- [Tests](#tests)
+- [Tech Stack](#tech-stack)
+- [Costs (Verified)](#costs-verified)
+
+## Prerequisites
+
+- Python 3.12+
+- [Vapi.ai](https://vapi.ai) account (Free Tier, $10 credits)
+- [ngrok](https://ngrok.com) or similar tunnel for local development
+- Anthropic API access (via Vapi — no separate key needed)
+- Docker (optional, for deployment)
 
 ## Quick Start
 
@@ -105,9 +134,7 @@ voice-agent/
 └── docker-compose.yml       # Local Docker deployment
 ```
 
-## Test Scenarios
-
-### Live Vapi Call Results
+## Live Vapi Call Results
 
 Verified with live Vapi calls on 2026-04-14. Assistant "Lisa" (ID: `2f93f394`) on Vapi Free Tier.
 
@@ -227,14 +254,29 @@ pytest tests/ -v
 # 156 tests covering agent config, analytics, holidays, webhook server, availability, notifications, auth
 ```
 
-## Costs
+## Tech Stack
 
-| Component | Cost |
-|-----------|------|
-| Vapi Free Tier | $10 credits (~200 min) |
-| Phone Number | ~$1/month |
-| Claude Sonnet 4 (via Vapi) | ~$0.01-0.03/call |
-| **5 Test Calls** | **~$0.50** |
+| Component | Version / Detail |
+|-----------|-----------------|
+| Python | 3.12+ |
+| FastAPI | webhook server |
+| uvicorn | ASGI server |
+| Vapi.ai | voice + LLM orchestration |
+| vapi-server-sdk | assistant/tool CRUD |
+| Claude Sonnet 4 | LLM (via Vapi) |
+| ElevenLabs | TTS (German voice) |
+| Chart.js | analytics dashboard |
+| Docker | production container |
+| Fly.io | deployment (Frankfurt) |
+
+## Costs (Verified)
+
+| Component | Cost | Verified |
+|-----------|------|----------|
+| Vapi Free Tier | $10 credits (~200 min) | 2026-04-14 |
+| Phone Number | ~$1/month | 2026-04-14 |
+| Claude Sonnet 4 (via Vapi) | ~$0.01-0.03/call | 2026-04-14 |
+| **5 Live Test Calls** | **~$0.50 total** | 2026-04-14 |
 
 ## License
 
