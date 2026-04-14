@@ -66,32 +66,36 @@ Lisa, the AI assistant for Dr. Sarah Müller's practice, answers incoming calls 
 
 ## Architecture
 
-```
-[Incoming Call]
-        │
-        ▼
-┌─ Vapi Agent (Lisa) ──────────────────────┐
-│  Model: Claude Sonnet 4 (Anthropic)      │
-│  Voice: ElevenLabs (German)              │
-│  System Prompt: Praxis Dr. Müller        │
-│                                          │
-│  Tools:                                  │
-│  - book_appointment ──┐                  │
-│  - transfer_call ─────┤ Webhook ────┐    │
-│  - send_summary ──────┘             │    │
-└──────────────────────────────────────┘    │
-                                           ▼
-                         ┌─ FastAPI Server ──────────┐
-                         │ /api/vapi/webhook          │
-                         │                            │
-                         │ → HMAC signature verify    │
-                         │ → Route tool calls         │
-                         │ → Check availability       │
-                         │ → Book appointments        │
-                         │ → Transfer calls (SIP)     │
-                         │ → Notify team (email/hook) │
-                         │ → Log to JSONL             │
-                         └────────────────────────────┘
+```mermaid
+flowchart TD
+    A["📞 Incoming Call"] --> B
+
+    subgraph VAPI["Vapi Agent — Lisa"]
+        B["STT · Claude Sonnet 4 · ElevenLabs TTS"]
+        B --> C{"Tool Call?"}
+    end
+
+    C -- "book_appointment\ntransfer_call\nsend_summary" --> D
+
+    subgraph SERVER["FastAPI Server"]
+        D["/api/vapi/webhook"] --> E["HMAC Verify"]
+        E --> F["Route Tool Call"]
+        F --> G["📅 Check Availability\n& Book Appointments"]
+        F --> H["📲 Transfer Call (SIP)"]
+        F --> I["📧 Notify Team\n(Email / Webhook)"]
+        F --> J["📝 Log to JSONL"]
+    end
+
+    G --> K["Response String (German)"]
+    H --> K
+    I --> K
+    K --> B
+    B --> L["🔊 Caller hears response"]
+
+    subgraph ANALYTICS["Analytics"]
+        J --> M["GET /api/analytics"]
+        M --> N["📊 Dashboard\n(Chart.js)"]
+    end
 ```
 
 ## Project Structure
