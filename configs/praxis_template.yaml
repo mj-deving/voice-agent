@@ -1,0 +1,29 @@
+# Praxis-Konfiguration Template
+# Kopiere diese Datei und passe die Werte für deine Praxis an.
+# Alle Felder sind erforderlich.
+
+# Praxis-Informationen
+praxis_name: "Praxis Dr. Mustermann"
+arzt_name: "Dr. Max Mustermann"
+arzt_titel: "Facharzt für Allgemeinmedizin"  # z.B. Zahnarzt, Physiotherapeut
+adresse: "Musterstraße 1, 12345 Musterstadt"
+telefon: "+49-123-4567890"
+
+# Öffnungszeiten (für System-Prompt)
+oeffnungszeiten: "Mo-Fr 8:00-12:00 und 14:00-18:00 Uhr"
+
+# Leistungen der Praxis
+services:
+  - "Allgemeinmedizin"
+  - "Vorsorgeuntersuchungen"
+  - "Impfungen"
+
+# Begrüßung (erster Satz den Lisa sagt)
+begruessung: "Praxis Dr. Mustermann, hier spricht Lisa, die digitale Assistentin. Wie kann ich Ihnen helfen?"
+
+# Abschiedsnachricht
+verabschiedung: "Vielen Dank für Ihren Anruf. Auf Wiederhören!"
+
+# Nummern
+notfall_nummer: "112"
+weiterleitung_nummer: "+49-123-4567890"

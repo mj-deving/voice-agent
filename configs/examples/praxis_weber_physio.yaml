@@ -1,0 +1,23 @@
+# Physiotherapie Weber — Hamburg
+
+praxis_name: "Physiotherapie Weber"
+arzt_name: "Kathrin Weber"
+arzt_titel: "Physiotherapeutin"
+adresse: "Eppendorfer Baum 12, 20249 Hamburg"
+telefon: "040-5551234"
+
+oeffnungszeiten: "Mo-Fr 7:00-20:00 Uhr, Sa 9:00-14:00 Uhr"
+
+services:
+  - "Krankengymnastik"
+  - "Manuelle Therapie"
+  - "Lymphdrainage"
+  - "Sportphysiotherapie"
+  - "Massage"
+  - "Rehasport"
+
+begruessung: "Physiotherapie Weber, hier spricht Lisa, die digitale Assistentin. Wie kann ich Ihnen helfen?"
+verabschiedung: "Vielen Dank für Ihren Anruf bei Physiotherapie Weber. Auf Wiederhören!"
+
+notfall_nummer: "112"
+weiterleitung_nummer: "+49405551234"

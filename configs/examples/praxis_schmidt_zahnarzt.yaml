@@ -1,0 +1,23 @@
+# Zahnarztpraxis Dr. Schmidt — Berlin
+
+praxis_name: "Zahnarztpraxis Dr. Schmidt"
+arzt_name: "Dr. Michael Schmidt"
+arzt_titel: "Zahnarzt"
+adresse: "Kurfürstendamm 42, 10719 Berlin"
+telefon: "030-9876543"
+
+oeffnungszeiten: "Mo-Do 8:00-13:00 und 14:00-18:00 Uhr, Fr 8:00-14:00 Uhr"
+
+services:
+  - "Zahnreinigung"
+  - "Füllungen"
+  - "Wurzelbehandlung"
+  - "Zahnersatz"
+  - "Kieferorthopädie"
+  - "Implantate"
+
+begruessung: "Zahnarztpraxis Dr. Schmidt, hier spricht Lisa, die digitale Assistentin. Wie kann ich Ihnen helfen?"
+verabschiedung: "Vielen Dank für Ihren Anruf bei der Zahnarztpraxis Dr. Schmidt. Auf Wiederhören!"
+
+notfall_nummer: "112"
+weiterleitung_nummer: "+49309876543"

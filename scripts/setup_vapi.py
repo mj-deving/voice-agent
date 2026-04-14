@@ -18,13 +18,13 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from vapi import Vapi
 
-from src.agent_config import TOOL_DEFINITIONS, get_assistant_config
+from src.agent_config import build_tool_definitions, get_assistant_config, load_praxis_config
 
 
-def create_tools(client: Vapi, webhook_url: str) -> list[str]:
+def create_tools(client: Vapi, webhook_url: str, tool_defs: list[dict]) -> list[str]:
     """Create tools on Vapi and return their IDs."""
     tool_ids = []
-    for tool_def in TOOL_DEFINITIONS:
+    for tool_def in tool_defs:
         func = tool_def["function"]
         request = {
             "type": tool_def["type"],
@@ -66,14 +66,15 @@ def create_hmac_credential(client: Vapi, secret: str) -> str | None:
         return credential.id
     except Exception as e:
         print(f"  Warning: Could not create HMAC credential: {e}")
-        print(f"  Configure webhook secret manually in Vapi Dashboard.")
+        print("  Configure webhook secret manually in Vapi Dashboard.")
         return None
 
 
 def create_assistant(client: Vapi, webhook_url: str, tool_ids: list[str],
-                     credential_id: str | None = None) -> str:
+                     credential_id: str | None = None,
+                     praxis_config: dict | None = None) -> str:
     """Create the Vapi assistant and return the assistant ID."""
-    config = get_assistant_config(f"{webhook_url}/api/vapi/webhook")
+    config = get_assistant_config(f"{webhook_url}/api/vapi/webhook", praxis_config)
 
     server_config = {"url": config["serverUrl"]}
     if credential_id:
@@ -107,7 +108,7 @@ def provision_phone_number(client: Vapi, assistant_id: str) -> str | None:
         return phone.number
     except Exception as e:
         print(f"  Warning: Could not provision phone number: {e}")
-        print(f"  Assign a phone number manually in Vapi Dashboard.")
+        print("  Assign a phone number manually in Vapi Dashboard.")
         return None
 
 
@@ -127,6 +128,10 @@ def main():
         "--webhook-secret",
         help="HMAC secret for webhook signature verification",
     )
+    parser.add_argument(
+        "--config",
+        help="Path to praxis YAML config (default: configs/examples/praxis_mueller.yaml)",
+    )
     args = parser.parse_args()
 
     api_key = os.environ.get("VAPI_API_KEY")
@@ -135,49 +140,53 @@ def main():
         print("Get your key from https://dashboard.vapi.ai/account")
         sys.exit(1)
 
-    print(f"Setting up Vapi assistant...")
+    praxis_config = load_praxis_config(args.config)
+    print("Setting up Vapi assistant...")
+    print(f"  Praxis: {praxis_config['praxis_name']}")
     print(f"  Webhook URL: {args.webhook_url}")
 
     client = Vapi(token=api_key)
+    tool_defs = build_tool_definitions(praxis_config)
 
     try:
         # Create HMAC credential if secret provided
         credential_id = None
         if args.webhook_secret:
-            print(f"\nCreating HMAC credential...")
+            print("\nCreating HMAC credential...")
             credential_id = create_hmac_credential(client, args.webhook_secret)
             if credential_id:
                 print(f"  Credential ID: {credential_id}")
 
         # Create tools
-        print(f"\nCreating tools...")
-        tool_ids = create_tools(client, args.webhook_url)
+        print("\nCreating tools...")
+        tool_ids = create_tools(client, args.webhook_url, tool_defs)
 
         # Create assistant
-        print(f"\nCreating assistant...")
-        assistant_id = create_assistant(client, args.webhook_url, tool_ids, credential_id)
+        print("\nCreating assistant...")
+        assistant_id = create_assistant(client, args.webhook_url, tool_ids,
+                                        credential_id, praxis_config)
         print(f"  Assistant ID: {assistant_id}")
 
         # Provision phone number if requested
         phone = None
         if args.phone_number:
-            print(f"\nProvisioning phone number...")
+            print("\nProvisioning phone number...")
             phone = provision_phone_number(client, assistant_id)
             if phone:
                 print(f"  Phone number: {phone}")
 
-        print(f"\nSetup complete!")
+        print("\nSetup complete!")
         print(f"  Assistant ID: {assistant_id}")
         if phone:
             print(f"  Phone number: {phone}")
         if args.webhook_secret:
             print(f"\n  Set VAPI_WEBHOOK_SECRET={args.webhook_secret} in your .env")
 
-        print(f"\nNext steps:")
-        print(f"  1. Start webhook server: python src/main.py")
+        print("\nNext steps:")
+        print("  1. Start webhook server: python src/main.py")
         if not phone:
-            print(f"  2. Assign a phone number in Vapi Dashboard")
-        print(f"  3. Call the number to test!")
+            print("  2. Assign a phone number in Vapi Dashboard")
+        print("  3. Call the number to test!")
 
     except Exception as e:
         print(f"Error during setup: {e}")

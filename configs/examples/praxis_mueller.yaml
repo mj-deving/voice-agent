@@ -1,0 +1,22 @@
+# Praxis Dr. Sarah Müller — Allgemeinmedizin, München
+
+praxis_name: "Praxis Dr. Müller"
+arzt_name: "Dr. Sarah Müller"
+arzt_titel: "Fachärztin für Allgemeinmedizin"
+adresse: "Marienplatz 5, 80331 München"
+telefon: "089-12345678"
+
+oeffnungszeiten: "Mo-Fr 8:00-12:00 und 14:00-18:00 Uhr"
+
+services:
+  - "Allgemeinmedizin"
+  - "Vorsorgeuntersuchungen"
+  - "Impfungen"
+  - "Labordiagnostik"
+  - "EKG"
+
+begruessung: "Praxis Dr. Müller, hier spricht Lisa, die digitale Assistentin. Wie kann ich Ihnen helfen?"
+verabschiedung: "Vielen Dank für Ihren Anruf. Auf Wiederhören!"
+
+notfall_nummer: "112"
+weiterleitung_nummer: "+498912345678"
