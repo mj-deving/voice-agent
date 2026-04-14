@@ -3,10 +3,14 @@
 import asyncio
 import logging
 import os
+from datetime import date
+from pathlib import Path
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 
+from src.analytics import get_analytics
 from src.availability import book_slot, get_next_available, is_slot_available
 from src.call_logger import log_call_event
 from src.notifications import send_notification
@@ -19,10 +23,24 @@ app.add_middleware(HmacAuthMiddleware)
 
 PRAXIS_PHONE = os.environ.get("PRAXIS_PHONE_NUMBER", "089-12345678")
 
+# Mount static files for dashboard
+_static_dir = Path(__file__).parent.parent / "static"
+if _static_dir.exists():
+    app.mount("/static", StaticFiles(directory=str(_static_dir)), name="static")
+
 
 @app.get("/health")
 async def health():
     return {"status": "ok"}
+
+
+@app.get("/api/analytics")
+async def analytics(
+    date_from: date | None = Query(None, alias="from"),
+    date_to: date | None = Query(None, alias="to"),
+):
+    """Return call analytics metrics as JSON."""
+    return get_analytics(date_from=date_from, date_to=date_to)
 
 
 @app.post("/api/vapi/webhook")

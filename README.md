@@ -71,8 +71,9 @@ Lisa, die KI-Assistentin der Praxis Dr. Sarah Müller, beantwortet eingehende An
 voice-agent/
 ├── src/
 │   ├── main.py              # Entry point — starts webhook server
-│   ├── agent_config.py      # System prompt, tools, voice/model config
-│   ├── webhook_server.py    # FastAPI server for Vapi tool calls
+│   ├── agent_config.py      # System prompt, tools, voice/model config (YAML-driven)
+│   ├── webhook_server.py    # FastAPI server for Vapi tool calls + analytics API
+│   ├── analytics.py         # Call log analytics (KPIs, charts data)
 │   ├── webhook_auth.py      # HMAC-SHA256 signature verification middleware
 │   ├── availability.py      # Appointment slot checking & booking
 │   ├── notifications.py     # Email (SMTP) + webhook notification dispatch
@@ -82,9 +83,14 @@ voice-agent/
 │   └── test_call.py         # Trigger test calls for 5 scenarios
 ├── configs/
 │   ├── scenarios.yaml       # 5 test scenarios (Termin, Rezept, Notfall, etc.)
-│   └── availability.yaml    # Office hours, slot duration, bookings path
-├── tests/                   # 108 tests
+│   ├── availability.yaml    # Office hours, slot duration, bookings path
+│   ├── praxis_template.yaml # Base template for new praxis configs
+│   └── examples/            # Example praxis configs (Mueller, Schmidt, Weber)
+├── static/
+│   └── dashboard.html       # Call analytics dashboard (Chart.js)
+├── tests/                   # 127 tests
 │   ├── test_agent_config.py # Agent configuration (42 tests)
+│   ├── test_analytics.py    # Call analytics (19 tests)
 │   ├── test_webhook.py      # Webhook endpoints (22 tests)
 │   ├── test_availability.py # Availability system (23 tests)
 │   ├── test_notifications.py# Notification dispatch (12 tests)
@@ -152,6 +158,31 @@ PORT=8000
 DEBUG=true
 ```
 
+## Multi-Praxis Support
+
+The agent is configurable for any medical practice via YAML:
+
+```bash
+# Setup with custom praxis config
+python scripts/setup_vapi.py --webhook-url https://... --config configs/examples/praxis_schmidt_zahnarzt.yaml
+
+# Default: Praxis Dr. Müller
+python scripts/setup_vapi.py --webhook-url https://your-tunnel.ngrok.io
+```
+
+New praxis = new YAML file. See `configs/praxis_template.yaml` for all fields.
+
+## Analytics Dashboard
+
+View call analytics at `http://localhost:8000/static/dashboard.html`:
+
+- KPI cards: total calls, calls today, booking rate, average duration
+- Bar chart: top appointment reasons
+- Timeline: calls per day
+- Date range filter
+
+API: `GET /api/analytics?from=2026-04-01&to=2026-04-14`
+
 ## Setup
 
 ```bash
@@ -179,7 +210,7 @@ fly deploy
 
 ```bash
 pytest tests/ -v
-# 108 tests covering agent config, webhook server, availability, notifications, auth
+# 127 tests covering agent config, analytics, webhook server, availability, notifications, auth
 ```
 
 ## Costs
