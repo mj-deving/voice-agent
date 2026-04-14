@@ -50,7 +50,8 @@ The webhook handles these message types: `function-call` (routed to handlers), `
 Additional endpoints: `GET /api/analytics` (call metrics with optional `?from=&to=` date filter), `GET /static/dashboard.html` (Chart.js dashboard UI).
 
 **Key modules:**
-- `agent_config.py` — loads praxis config from YAML (`configs/examples/`), generates system prompt, first message, and tool definitions. Module-level constants (`SYSTEM_PROMPT`, `FIRST_MESSAGE`, `TOOL_DEFINITIONS`) load default Mueller config for backward compat. New praxis = new YAML file + `--config` flag on setup_vapi.py.
+- `agent_config.py` — loads praxis config from YAML (`configs/examples/`), generates system prompt, first message, and tool definitions. `build_first_message()` returns context-aware greeting (holiday/outside hours/normal). Module-level constants (`SYSTEM_PROMPT`, `FIRST_MESSAGE`, `TOOL_DEFINITIONS`) load default Mueller config for backward compat. New praxis = new YAML file + `--config` flag on setup_vapi.py.
+- `holidays.py` — `is_holiday(date)` checks against `configs/availability.yaml` holidays section (13 German holidays: 9 federal + 4 Bavaria). `is_outside_hours(datetime)` checks against office hours config.
 - `analytics.py` — reads `data/call_log.jsonl`, computes dashboard metrics (calls total/today, avg duration, booking rate, top reasons, calls/day). Single-pass computation. Supports date range filtering.
 - `availability.py` — reads `configs/availability.yaml` for office hours, checks/books slots, persists bookings to `data/bookings.json`
 - `notifications.py` — dispatches call summaries via email (SMTP) and/or webhook (httpx POST). Channels configured via env vars, unconfigured channels silently skip.

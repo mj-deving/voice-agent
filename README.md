@@ -27,7 +27,7 @@ python src/main.py
 
 Lisa, die KI-Assistentin der Praxis Dr. Sarah Müller, beantwortet eingehende Anrufe auf Deutsch:
 
-- Begrüßt Anrufer und fragt nach dem Anliegen
+- Begrüßt Anrufer kontextabhängig (Feiertag/außerhalb Öffnungszeiten/normal) und fragt nach dem Anliegen
 - Unterscheidet neue und bestehende Patienten
 - Bucht Termine mit Verfügbarkeitsprüfung (`book_appointment`) — schlägt Alternativen vor wenn belegt
 - Leitet Anrufe an die Praxis weiter bei Rezepten/Überweisungen (`transfer_call`) — echte Telefonweiterleitung via Vapi
@@ -74,6 +74,7 @@ voice-agent/
 │   ├── agent_config.py      # System prompt, tools, voice/model config (YAML-driven)
 │   ├── webhook_server.py    # FastAPI server for Vapi tool calls + analytics API
 │   ├── analytics.py         # Call log analytics (KPIs, charts data)
+│   ├── holidays.py          # German holiday detection + office hours check
 │   ├── webhook_auth.py      # HMAC-SHA256 signature verification middleware
 │   ├── availability.py      # Appointment slot checking & booking
 │   ├── notifications.py     # Email (SMTP) + webhook notification dispatch
@@ -83,14 +84,15 @@ voice-agent/
 │   └── test_call.py         # Trigger test calls for 5 scenarios
 ├── configs/
 │   ├── scenarios.yaml       # 5 test scenarios (Termin, Rezept, Notfall, etc.)
-│   ├── availability.yaml    # Office hours, slot duration, bookings path
+│   ├── availability.yaml    # Office hours, holidays, slot duration, bookings path
 │   ├── praxis_template.yaml # Base template for new praxis configs
 │   └── examples/            # Example praxis configs (Mueller, Schmidt, Weber)
 ├── static/
 │   └── dashboard.html       # Call analytics dashboard (Chart.js)
-├── tests/                   # 127 tests
+├── tests/                   # 156 tests
 │   ├── test_agent_config.py # Agent configuration (42 tests)
 │   ├── test_analytics.py    # Call analytics (19 tests)
+│   ├── test_holidays.py     # Holiday detection + greetings (29 tests)
 │   ├── test_webhook.py      # Webhook endpoints (22 tests)
 │   ├── test_availability.py # Availability system (23 tests)
 │   ├── test_notifications.py# Notification dispatch (12 tests)
@@ -172,6 +174,18 @@ python scripts/setup_vapi.py --webhook-url https://your-tunnel.ngrok.io
 
 New praxis = new YAML file. See `configs/praxis_template.yaml` for all fields.
 
+## Holiday & Hours-Aware Greetings
+
+Lisa's greeting adapts automatically:
+
+| Situation | Greeting |
+|-----------|----------|
+| Holiday | "Die Praxis ist heute wegen {Feiertag} geschlossen. In Notfällen..." |
+| Outside hours | "Die Praxis ist derzeit geschlossen. Unsere Öffnungszeiten sind..." |
+| Normal hours | Standard greeting from praxis YAML config |
+
+Holidays are configured in `configs/availability.yaml` (13 German holidays: 9 federal + 4 Bavaria).
+
 ## Analytics Dashboard
 
 View call analytics at `http://localhost:8000/static/dashboard.html`:
@@ -210,7 +224,7 @@ fly deploy
 
 ```bash
 pytest tests/ -v
-# 127 tests covering agent config, analytics, webhook server, availability, notifications, auth
+# 156 tests covering agent config, analytics, holidays, webhook server, availability, notifications, auth
 ```
 
 ## Costs
