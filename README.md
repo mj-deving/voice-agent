@@ -99,13 +99,19 @@ voice-agent/
 
 ## Test Scenarios
 
-| # | Scenario | Expected Action |
-|---|----------|----------------|
-| 1 | Neuer Patient, Rückenschmerzen | `book_appointment` |
-| 2 | Bestandspatient, Rezept | `transfer_call` |
-| 3 | Notfall, Brustschmerzen | 112 empfehlen |
-| 4 | Frage zu Öffnungszeiten | Info direkt geben |
-| 5 | Pharma-Vertreter | `send_summary` |
+### Live Vapi Call Results
+
+Verified with live Vapi calls on 2026-04-14. Assistant "Lisa" (ID: `2f93f394`) on Vapi Free Tier.
+
+| # | Scenario | Caller | Expected Action | Result | Notes |
+|---|----------|--------|----------------|--------|-------|
+| 1 | Neuer Patient, Rückenschmerzen | Thomas Schneider | `book_appointment` | PASS | Termin korrekt gebucht, Neupatient erkannt |
+| 2 | Bestandspatient, Rezept | Maria Weber | `transfer_call` | PASS | Weiterleitung an Praxis für Rezept-Nachbestellung |
+| 3 | Notfall, Brustschmerzen | Hans Müller | 112 empfehlen | PASS | Sofortige Notfall-Erkennung, 112 empfohlen |
+| 4 | Frage zu Öffnungszeiten | Anna Schmidt | Info direkt geben | PASS | Öffnungszeiten korrekt aus Config vorgelesen |
+| 5 | Pharma-Vertreter | Dr. Klaus Fischer | `send_summary` | PASS | Zusammenfassung erstellt, action_required gesetzt |
+
+**5/5 Szenarien bestanden** — alle Webhook-Handler korrekt angesprochen, deutsche Antworten flüssig.
 
 ```bash
 # List scenarios
