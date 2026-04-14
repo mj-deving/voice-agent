@@ -1,8 +1,11 @@
 """Vapi Agent configuration — loads praxis config from YAML."""
 
+from datetime import datetime
 from pathlib import Path
 
 import yaml
+
+from src.holidays import is_holiday, is_outside_hours
 
 CONFIGS_DIR = Path(__file__).parent.parent / "configs"
 DEFAULT_CONFIG = CONFIGS_DIR / "examples" / "praxis_mueller.yaml"
@@ -62,6 +65,35 @@ def build_system_prompt(config: dict) -> str:
         f"Ton: Freundlich, professionell, empathisch. Sprich immer Deutsch.\n"
         f"Halte dich kurz und präzise. Frage immer nur eine Sache auf einmal."
     )
+
+
+def build_first_message(config: dict, now: datetime | None = None) -> str:
+    """Generate the first message based on holiday/hours status.
+
+    Returns holiday greeting, outside-hours greeting, or normal greeting.
+    """
+    if now is None:
+        now = datetime.now()
+
+    holiday, holiday_name = is_holiday(now.date())
+    if holiday:
+        return (
+            f"{config['praxis_name']}, hier spricht Lisa, die digitale Assistentin. "
+            f"Die Praxis ist heute wegen {holiday_name} geschlossen. "
+            f"In Notfällen rufen Sie bitte die {config['notfall_nummer']} an. "
+            f"Kann ich Ihnen anderweitig helfen?"
+        )
+
+    if is_outside_hours(now):
+        return (
+            f"{config['praxis_name']}, hier spricht Lisa, die digitale Assistentin. "
+            f"Die Praxis ist derzeit geschlossen. "
+            f"Unsere Öffnungszeiten sind {config['oeffnungszeiten']}. "
+            f"In Notfällen rufen Sie bitte die {config['notfall_nummer']} an. "
+            f"Kann ich Ihnen anderweitig helfen?"
+        )
+
+    return config["begruessung"]
 
 
 def build_tool_definitions(config: dict) -> list[dict]:
@@ -169,7 +201,7 @@ def get_assistant_config(webhook_url: str, config: dict | None = None) -> dict:
 
     return {
         "name": f"Lisa - {config['praxis_name']}",
-        "firstMessage": config["begruessung"],
+        "firstMessage": build_first_message(config),
         "model": {
             **MODEL_CONFIG,
             "messages": [{"role": "system", "content": system_prompt}],
@@ -184,5 +216,5 @@ def get_assistant_config(webhook_url: str, config: dict | None = None) -> dict:
 # Default module-level exports for backward compatibility
 _default_config = load_praxis_config()
 SYSTEM_PROMPT = build_system_prompt(_default_config)
-FIRST_MESSAGE = _default_config["begruessung"]
+FIRST_MESSAGE = build_first_message(_default_config)
 TOOL_DEFINITIONS = build_tool_definitions(_default_config)
