@@ -7,7 +7,7 @@
 [![Docker](https://img.shields.io/badge/docker-ready-blue.svg)](#deployment)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](#license)
 
-**KI-Telefonagent für Arztpraxen — beantwortet Anrufe auf Deutsch, bucht Termine mit Verfügbarkeitsprüfung, erkennt Notfälle, leitet weiter, und passt die Begrüßung an Feiertage und Öffnungszeiten an.** Multi-Praxis-fähig via YAML-Config. 156 Tests, Analytics-Dashboard, 5/5 Live-Szenarien bestanden.
+**AI phone agent for medical practices — answers calls in German, books appointments with availability checking, detects emergencies, transfers calls, and adapts greetings to holidays and office hours.** Multi-practice support via YAML config. 156 tests, analytics dashboard, 5/5 live scenarios passed.
 
 ## Table of Contents
 
@@ -17,7 +17,7 @@
 - [Project Structure](#project-structure)
 - [Live Vapi Call Results](#live-vapi-call-results)
 - [Configuration](#configuration)
-- [Multi-Praxis Support](#multi-praxis-support)
+- [Multi-Practice Support](#multi-practice-support)
 - [Holiday & Hours-Aware Greetings](#holiday--hours-aware-greetings)
 - [Analytics Dashboard](#analytics-dashboard)
 - [Setup](#setup)
@@ -54,25 +54,25 @@ python src/main.py
 
 ## What It Does
 
-Lisa, die KI-Assistentin der Praxis Dr. Sarah Müller, beantwortet eingehende Anrufe auf Deutsch:
+Lisa, the AI assistant for Dr. Sarah Müller's practice, answers incoming calls in German:
 
-- Begrüßt Anrufer kontextabhängig (Feiertag/außerhalb Öffnungszeiten/normal) und fragt nach dem Anliegen
-- Unterscheidet neue und bestehende Patienten
-- Bucht Termine mit Verfügbarkeitsprüfung (`book_appointment`) — schlägt Alternativen vor wenn belegt
-- Leitet Anrufe an die Praxis weiter bei Rezepten/Überweisungen (`transfer_call`) — echte Telefonweiterleitung via Vapi
-- Erkennt Notfälle und empfiehlt sofort 112
-- Sendet Zusammenfassungen ans Praxisteam per E-Mail und/oder Webhook (`send_summary`)
-- Beantwortet Fragen zu Öffnungszeiten und Adresse
+- Greets callers context-aware (holiday / outside hours / normal) and asks for their concern
+- Distinguishes new and existing patients
+- Books appointments with availability checking (`book_appointment`) — suggests alternatives when slots are taken
+- Transfers calls to the practice for prescriptions/referrals (`transfer_call`) — real phone transfer via Vapi
+- Detects emergencies and immediately recommends calling 112
+- Sends call summaries to the practice team via email and/or webhook (`send_summary`)
+- Answers questions about office hours and address
 
 ## Architecture
 
 ```
-[Eingehender Anruf]
+[Incoming Call]
         │
         ▼
 ┌─ Vapi Agent (Lisa) ──────────────────────┐
 │  Model: Claude Sonnet 4 (Anthropic)      │
-│  Voice: ElevenLabs (Deutsch)             │
+│  Voice: ElevenLabs (German)              │
 │  System Prompt: Praxis Dr. Müller        │
 │                                          │
 │  Tools:                                  │
@@ -112,10 +112,10 @@ voice-agent/
 │   ├── setup_vapi.py        # Automated Vapi assistant + tools + phone setup
 │   └── test_call.py         # Trigger test calls for 5 scenarios
 ├── configs/
-│   ├── scenarios.yaml       # 5 test scenarios (Termin, Rezept, Notfall, etc.)
+│   ├── scenarios.yaml       # 5 test scenarios (appointment, prescription, emergency, etc.)
 │   ├── availability.yaml    # Office hours, holidays, slot duration, bookings path
-│   ├── praxis_template.yaml # Base template for new praxis configs
-│   └── examples/            # Example praxis configs (Mueller, Schmidt, Weber)
+│   ├── praxis_template.yaml # Base template for new practice configs
+│   └── examples/            # Example practice configs (Mueller, Schmidt, Weber)
 ├── static/
 │   └── dashboard.html       # Call analytics dashboard (Chart.js)
 ├── tests/                   # 156 tests
@@ -140,13 +140,13 @@ Verified with live Vapi calls on 2026-04-14. Assistant "Lisa" (ID: `2f93f394`) o
 
 | # | Scenario | Caller | Expected Action | Result | Notes |
 |---|----------|--------|----------------|--------|-------|
-| 1 | Neuer Patient, Rückenschmerzen | Thomas Schneider | `book_appointment` | PASS | Termin korrekt gebucht, Neupatient erkannt |
-| 2 | Bestandspatient, Rezept | Maria Weber | `transfer_call` | PASS | Weiterleitung an Praxis für Rezept-Nachbestellung |
-| 3 | Notfall, Brustschmerzen | Hans Müller | 112 empfehlen | PASS | Sofortige Notfall-Erkennung, 112 empfohlen |
-| 4 | Frage zu Öffnungszeiten | Anna Schmidt | Info direkt geben | PASS | Öffnungszeiten korrekt aus Config vorgelesen |
-| 5 | Pharma-Vertreter | Dr. Klaus Fischer | `send_summary` | PASS | Zusammenfassung erstellt, action_required gesetzt |
+| 1 | New patient, back pain | Thomas Schneider | `book_appointment` | PASS | Appointment booked, new patient recognized |
+| 2 | Existing patient, prescription | Maria Weber | `transfer_call` | PASS | Transferred to practice for prescription refill |
+| 3 | Emergency, chest pain | Hans Müller | Recommend 112 | PASS | Immediate emergency detection, 112 recommended |
+| 4 | Office hours inquiry | Anna Schmidt | Provide info | PASS | Office hours read correctly from config |
+| 5 | Pharma representative | Dr. Klaus Fischer | `send_summary` | PASS | Summary created, action_required flag set |
 
-**5/5 Szenarien bestanden** — alle Webhook-Handler korrekt angesprochen, deutsche Antworten flüssig.
+**5/5 scenarios passed** — all webhook handlers triggered correctly, fluent German responses.
 
 ```bash
 # List scenarios
@@ -187,29 +187,29 @@ PORT=8000
 DEBUG=true
 ```
 
-## Multi-Praxis Support
+## Multi-Practice Support
 
 The agent is configurable for any medical practice via YAML:
 
 ```bash
-# Setup with custom praxis config
+# Setup with custom practice config
 python scripts/setup_vapi.py --webhook-url https://... --config configs/examples/praxis_schmidt_zahnarzt.yaml
 
 # Default: Praxis Dr. Müller
 python scripts/setup_vapi.py --webhook-url https://your-tunnel.ngrok.io
 ```
 
-New praxis = new YAML file. See `configs/praxis_template.yaml` for all fields.
+New practice = new YAML file. See `configs/praxis_template.yaml` for all fields.
 
 ## Holiday & Hours-Aware Greetings
 
 Lisa's greeting adapts automatically:
 
-| Situation | Greeting |
-|-----------|----------|
-| Holiday | "Die Praxis ist heute wegen {Feiertag} geschlossen. In Notfällen..." |
-| Outside hours | "Die Praxis ist derzeit geschlossen. Unsere Öffnungszeiten sind..." |
-| Normal hours | Standard greeting from praxis YAML config |
+| Situation | Greeting (in German) |
+|-----------|---------------------|
+| Holiday | "The practice is closed today due to {holiday}. In emergencies..." |
+| Outside hours | "The practice is currently closed. Our office hours are..." |
+| Normal hours | Standard greeting from practice YAML config |
 
 Holidays are configured in `configs/availability.yaml` (13 German holidays: 9 federal + 4 Bavaria).
 
