@@ -1,12 +1,5 @@
 # Voice Agent — Praxis Dr. Müller
 
-[![Python](https://img.shields.io/badge/python-3.12+-blue.svg)](#tech-stack)
-[![Vapi.ai](https://img.shields.io/badge/vapi.ai-voice--agent-blue.svg)](https://vapi.ai)
-[![Status](https://img.shields.io/badge/status-live-brightgreen.svg)](#live-vapi-call-results)
-[![Tests](https://img.shields.io/badge/tests-156%2F156-brightgreen.svg)](#tests)
-[![Docker](https://img.shields.io/badge/docker-ready-blue.svg)](#deployment)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](#license)
-
 ![FastAPI](https://img.shields.io/badge/-FastAPI-009688?style=flat-square) ![Vapi](https://img.shields.io/badge/-Vapi-7C3AED?style=flat-square) ![Python](https://img.shields.io/badge/-Python-3776AB?style=flat-square) ![Docker](https://img.shields.io/badge/-Docker-2496ED?style=flat-square)
 
 **AI phone agent for medical practices — answers calls in German, books appointments with availability checking, detects emergencies, transfers calls, and adapts greetings to holidays and office hours.** Multi-practice support via YAML config. 156 tests, analytics dashboard, 5/5 live scenarios passed.
