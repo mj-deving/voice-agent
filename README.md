@@ -93,6 +93,8 @@ flowchart TD
     end
 ```
 
+![Call sequence diagram — time-ordered flow from caller through Vapi, FastAPI webhook, availability checking, and notifications](docs/diagrams/call-sequence.png)
+
 ## Project Structure
 
 ```
