@@ -1,8 +1,15 @@
-# Voice Agent — Praxis Dr. Müller
+# Voice Agent (demo build, fictional practice)
 
 ![FastAPI](https://img.shields.io/badge/-FastAPI-009688?style=flat-square) ![Vapi](https://img.shields.io/badge/-Vapi-7C3AED?style=flat-square) ![Python](https://img.shields.io/badge/-Python-3776AB?style=flat-square) ![Docker](https://img.shields.io/badge/-Docker-2496ED?style=flat-square)
 
-**AI phone agent for medical practices — answers calls in German, books appointments with availability checking, detects emergencies, transfers calls, and adapts greetings to holidays and office hours.** Multi-practice support via YAML config. 156 tests, analytics dashboard, 5/5 live scenarios passed.
+> **Everything about the practice in this repository is invented.** "Praxis Dr.
+> Müller", its staff, its opening hours and every caller name in the tables below
+> are fixtures I wrote for a demo. This agent has never taken a call for a real
+> medical practice, it has no practice as a user, and it is not deployed anywhere
+> that the public can reach. The Fly.io and Docker files are how you *would*
+> deploy it, not a record that I did.
+
+**AI phone agent for medical practices: answers calls in German, books appointments with availability checking, detects emergencies, transfers calls, and adapts greetings to holidays and office hours.** Multi-practice support via YAML config. 156 tests, analytics dashboard, 5/5 synthetic call scenarios passed.
 
 ## Table of Contents
 
@@ -135,9 +142,11 @@ voice-agent/
 └── docker-compose.yml       # Local Docker deployment
 ```
 
-## Live Vapi Call Results
+## Vapi Call Results (synthetic scenarios)
 
-Verified with live Vapi calls on 2026-04-14. Assistant "Lisa" (ID: `2f93f394`) on Vapi Free Tier.
+Five scenarios I wrote and then placed as real phone calls against my own Vapi
+assistant on 2026-04-14 ("Lisa", ID `2f93f394`, Vapi Free Tier). The calls were
+real; the callers, their complaints and the practice they were calling are not.
 
 | # | Scenario | Caller | Expected Action | Result | Notes |
 |---|----------|--------|----------------|--------|-------|
